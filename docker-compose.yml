@@ -1,0 +1,39 @@
+version: '3.4'
+
+services:
+
+  postgresdb:
+    image: postgres
+    volumes:
+      - simplepaymentservice-postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=simplepaymentservice
+      - POSTGRES_USER=developer
+      - POSTGRES_PASSWORD=123
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - 5432:5432
+
+  simplepaymentservice:
+    build:
+      context: .
+      args:
+        - installdev=true
+    volumes:
+      - .:/app
+    command: sh start.sh
+    environment:
+      - DB_NAME=simplepaymentservice
+      - DB_USER=developer
+      - DB_PASSWORD=123
+      - DB_HOST=postgresdb
+      - DB_PORT=5432
+      - APP_PORT=5000
+      - RELOAD=true
+    ports:
+      - 5000:5000
+    depends_on:
+      - postgresdb
+
+volumes:
+  simplepaymentservice-postgres-data:
